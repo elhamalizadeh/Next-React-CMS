@@ -1,6 +1,13 @@
-
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
 
 const Header = () => {
+    const router = useRouter();
+    const { user, logout } = useContext(AuthContext);
+    console.log(user);
+    
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container-fluid">
@@ -30,12 +37,23 @@ const Header = () => {
                 <a className="nav-link disabled" aria-disabled="true">Disabled</a>
               </li>
             </ul>
-            <form className="d-flex" role="search">
-              <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-              <button className="btn btn-outline-success" type="submit">Search</button>
-            </form>
-            <a className="btn btn-primary ms-2 me-2" href="/auth/login">Login</a>
-            <a className="btn btn-success" href="/auth/register">Register</a>
+            <div className="d-flex">
+                        {user ? (
+                            <>
+                                <span className="me-3">{user.name}</span>
+                                <button onClick={logout} className="btn btn-sm btn-dark">logout</button>
+                            </>
+                        ) : (
+                            <>
+                                <Link href="/auth/login" className="btn btn-sm btn-outline-secondary me-2">
+                                  login
+                                </Link>
+                                <Link href="/auth/register" className="btn btn-sm btn-dark">
+                                    register
+                                </Link>
+                            </>
+                        )}
+                    </div>
 
           </div>
         </div>

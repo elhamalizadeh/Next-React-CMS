@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -42,18 +43,54 @@ export const AuthProvider = ({ children }) => {
             setError(handleError(data.message))
             setLoading(false)
         }
-
-        console.log(data);
     }
 
     // Login user
     const login = async (user) => {
-        console.log(user);
+        setError(null)
+        setLoading(true);
+
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(user)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            setUser(data.user)
+            setLoading(false)
+            router.push('/')
+        } else {
+            setError(handleError(data.message))
+            setLoading(false)
+        }
     }
 
     // Logout user
     const logout = async () => {
-        console.log(user);
+        setError(null)
+
+        const res = await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            }
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            setUser(null)
+            router.push('/')
+        } else {
+            setError(handleError(data.message))
+        }
     }
 
     // Check if user logged in
@@ -62,7 +99,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ error, loading, register, login, logout }}>
+        <AuthContext.Provider value={{ user, error, loading, register, login, logout }}>
             {children}
         </AuthContext.Provider>
     )
